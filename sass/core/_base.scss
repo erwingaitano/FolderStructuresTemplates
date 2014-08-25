@@ -1,0 +1,34 @@
+*{
+  @include box-sizing(border-box);
+  margin: 0;
+  padding: 0;
+}
+
+body{
+  color: $color-primary;
+}
+
+img{
+  max-width: 100%;
+}
+
+button{
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// There's a bug in some browsers that don't allow to scroll when hovering an svg element
+svg{
+  pointer-events: none;
+}
+
+a{
+  text-decoration: none;
+}

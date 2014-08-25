@@ -1,0 +1,9 @@
+/*
+  Note: With the new updated version of svgstore (>=0.5), there's no need to define a width nor height for every svgicon.
+  It's recommended to defined a width and height for all svg-icons as following:
+ */
+
+.svg-icon{
+  width: 30px;
+  height: 30px;
+}

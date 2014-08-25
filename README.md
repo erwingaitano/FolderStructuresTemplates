@@ -1,4 +1,4 @@
 Folder Structure Templates
 ==========================
 
-Common SASS and JS structure folders for Websites and Webapps.
+Common CSS (SASS) and JS folder structure for Websites and Webapps.

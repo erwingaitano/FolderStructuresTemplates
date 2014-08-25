@@ -1,0 +1,16 @@
+%button{
+  border-radius: 2px;
+  display: inline-block;
+  font-size: 13px;
+  padding: 10px 25px 10px;
+}
+
+.button--default{
+  @extend %button;
+  background-color: $color-secondary;
+  color: #FFF;
+
+  &:hover{
+    background-color: $color-secondary;
+  }
+}
