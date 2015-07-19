@@ -4,11 +4,22 @@
   padding: 0;
 }
 
+body,
+html{
+  height: 100%;
+  width: 100%;
+}
+
 body{
   color: $color-primary;
+
+  // Prevent animation at first load of the page
+  &.stop-animation *{ @include transition(none !important); }
 }
 
 img{
+  display: block;
+  margin: 0 auto;
   max-width: 100%;
 }
 
@@ -30,5 +41,6 @@ svg{
 }
 
 a{
+  cursor: pointer;
   text-decoration: none;
 }

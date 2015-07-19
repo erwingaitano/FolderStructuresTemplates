@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html class="js-html">
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <title>Million Strong</title>
+    <meta name="description" content="Help bring free education to one million kids in less than 60 days.">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="<%= asset_path("favicon.ico") %>" type="image/x-icon"></link>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="<%= asset_path("application.css") %>" media="all"></link>
+    <!-- Rails csrf_meta_tags -->
+    <%= csrf_meta_tags %>
+  </head>
+
+  <body class="stop-animation js-body">
+    <!-- If you use SVG Icons, put the SVG sprite declaration here -->
+    <%= render "shared/svg_icons" %>
+    <!--/ Rails yield -->
+    <div class="container-scrollable js-main-container">
+      <%= render "shared/header" %>
+      <%= yield %>
+      <%= render "shared/footer" %>
+    </div>
+
+    <!-- Place the scripts at the bottom of the page. Placing scripts at the end of the page improves app load time because the HTML loading is not blocked by the loading of the scripts. -->
+    <script src="<%= asset_path("application.js") %>"></script>
+  </body>
+</html>

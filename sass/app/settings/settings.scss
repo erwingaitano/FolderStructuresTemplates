@@ -1,17 +1,21 @@
 /********************
-***** Color
+***** COLOR
 ********************/
 
 $color-brand:                     #BE2E21;
 $color-primary:                   #6C6C6C;
 $color-secondary:                 #FF0000;
+$border-color:                    #e4e4e4;
 
 /********************
-***** Typography
+***** TYPOGRAPHY
 ********************/
 
 $helvetica-font:                  "Helvetica Neue", Helvetica, Arial, sans-serif;
+$icon-font:                       "icon";
 $font-size-base:                  14px;
 $font-family-default:             $helvetica-font;
 $font-size-default:               $font-size-base;
 $line-height-default:             1.4;
+$font-bold:                       600;
+$font-normal:                     500;
