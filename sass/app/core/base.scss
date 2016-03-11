@@ -1,13 +1,21 @@
 *{
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
+
+//  html
+//    body
+//      .container-main  **** .is-sticky is optional for sticky footers
+//        .container
+//          *** Your actual content **
+//      .footer
 
 body,
 html{
   height: 100%;
   width: 100%;
+  position: relative; // If you want to add overflow hidden here for mobile, this is necessary
 }
 
 body{
@@ -18,6 +26,7 @@ body{
 }
 
 img{
+  border: 0;
   display: block;
   margin: 0 auto;
   max-width: 100%;

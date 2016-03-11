@@ -2,12 +2,6 @@
 ***** Mixins
 ********************/
 
-@mixin box-sizing($boxmodel) {
-  -webkit-box-sizing: $boxmodel;
-     -moz-box-sizing: $boxmodel;
-          box-sizing: $boxmodel;
-}
-
 @mixin translate($x, $y) {
   -webkit-transform: translate($x, $y);
       -ms-transform: translate($x, $y); // IE9 only
@@ -173,6 +167,34 @@
   }
 }
 
+// Range input slider 
+
+@mixin range-slider-thump(){
+  &::-webkit-slider-thumb {
+    @content;
+  }
+  &::-moz-range-thumb {
+    @content;
+  }
+  &::-ms-thumb {
+    @content;
+  }
+}
+
+@mixin range-slider-track(){
+  &::-webkit-slider-runnable-track {
+    @content;
+  }
+
+  &::-moz-range-track {
+    animate: 0.2s;
+    @content;
+  }
+  &::-ms-track {
+    @content;
+  }
+}
+
 // How to use it: 
 // @include add-mobile-media-query(){ padding: 11px 10px; };
 @mixin add-mobile-media-query(){
@@ -252,7 +274,6 @@
   &:before{
     content: "";
     display: inline-block;
-    font-size: 0;
     margin-right: -4px;
     vertical-align: middle;
     width: 0;
@@ -282,7 +303,9 @@
 
 /** 
  *  When using border-radius and overflow: hidden with position: absolute: 
- * -webkit-mask-image: -webkit-radial-gradient(circle, white, black); 
+ *  -webkit-mask-image: -webkit-radial-gradient(circle, white, black); 
+ *  Be careful, this also emulates the overflow hidden effect
+ *
  * 
  *  This can aliviate a little the performance impact. PD: Dont apply on table elements! 
  *  And always test child elements
@@ -295,8 +318,9 @@
  *  When animating with angular please avoid assigning transform translate to the ng-enter/ng-leave ui-views. Because it will cause bug calculation on widths/heights through js (for example in my jquery.popup plugin) So far this error only happens in mobile and also when I try to calculate position/width of containers/viewports. (If you need to do transitions between pages, try to use only visibility/opacity combo and only declaring a transition-transform declaration with the delay for the animation will do it.)
  *  
  *  
- *  
- *  
+ * IPAD viewport height=devide-height bug
+ * Looks like if you set the height of the viewport to device-height, there are bugs calculationg the height on ipad.
+ * So avoid adding this attritube.
  *  
  *  
  */
@@ -338,13 +362,14 @@
 .ctable{
   overflow: auto;
   height: 100%;
-}
-.ctable__container{
-  display: table;
-  height: 100%;
-  width: 100%;
-}
-.ctable__content{
-  display: table-cell;
-  vertical-align: middle;
+  
+  .ctable__container{
+    display: table;
+    height: 100%;
+    width: 100%;
+  }
+  .ctable__content{
+    display: table-cell;
+    vertical-align: middle;
+  }
 }

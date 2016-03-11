@@ -16,6 +16,17 @@
  * click a new tab, the class 'is-active' will be set for this new tab
  * and his corresponding container.
  * 
+ * 
+ *       nav.tab
+ *          %a.tab__item.is-active.js-tab{:'data-tab' => 'content1', :'data-tab-namespace' => 'elements'} 
+ *          %a.tab__item.js-tab{:'data-tab' => 'content2', :'data-tab-namespace' => 'elements'} 
+ *          %a.tab__item.js-tab{:'data-tab' => 'content3', :'data-tab-namespace' => 'elements'} 
+ *         
+ *       .tab-container.is-active.js-tab-container{:'data-tab' => 'content1', :'data-tab-namespace' => 'elements'}
+ *       .tab-container.js-tab-container{:'data-tab' => 'content2', :'data-tab-namespace' => 'elements'}
+ *       .tab-container.js-tab-container{:'data-tab' => 'content3', :'data-tab-namespace' => 'elements'}
+ *        
+ * 
  */
 
 (function(){
