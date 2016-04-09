@@ -5,6 +5,7 @@ import { START_USER_REQUEST, CANCEL_USER_REQUEST,
          userRequestCanceled, userRequestFailed,
          userRequestSucceed, userRequestStarted } from './user';
 
+// You may want this function to be imported from an api folder or something
 export function fakeExternalApi(id, ms) {
   return new Promise((resolve, reject) => {
     if (Math.floor(Math.random() * 100) % 2) {
@@ -48,7 +49,7 @@ export function* getUser(id) {
  * spam requests and only the last one will be proceessed (finished by success or error).
  * You also can be able to cancel the in the way task.
  */
-export default function* saga() {
+export default function* cancelableTakeLatestSaga() {
   let task;
 
   while (true) {
@@ -70,7 +71,7 @@ export default function* saga() {
  * This pattern is useful when you want to just do one async action and wait till
  * it finishes or is manually canceled by a user, before continuing.
  */
-export default function* saga() {
+export default function* cancelableTakeFirstSaga() {
   while (true) {
     const action = yield take(START_USER_REQUEST);
     const task = yield fork(getUser, action.id);

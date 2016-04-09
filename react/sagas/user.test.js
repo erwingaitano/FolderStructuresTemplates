@@ -235,10 +235,11 @@ describe('Module User', function () {
       });
     });
 
-    describe('saga()', () => {
-      it('should start user request for the first time and listen for start/cancel request', () => {
-        const dummyAction = { type: START_USER_REQUEST, id: 3 };
-        const dummyTask = { type: START_USER_REQUEST, id: 3 };
+    describe('cancelableTakeLatestSaga()', () => {
+      it(`should start an user request for the
+          first time and listen for start/cancel request`, () => {
+        const dummyAction = startUserRequest(3);
+        const dummyTask = createMockTask();
 
         const gen = saga();
         let next = gen.next();
@@ -258,8 +259,8 @@ describe('Module User', function () {
       it('should start a new user request and cancel an existing one', () => {
         const dummyTask = createMockTask();
         const dummyTask2 = createMockTask();
-        const dummyAction = { type: START_USER_REQUEST, id: 3 };
-        const dummyAction2 = { type: START_USER_REQUEST, id: 4 };
+        const dummyAction = startUserRequest(3);
+        const dummyAction2 = startUserRequest(4);
         const gen = saga();
         let next = gen.next();
 
@@ -288,7 +289,7 @@ describe('Module User', function () {
       });
 
       it('should cancel a non existant user request', () => {
-        const dummyAction = { type: CANCEL_USER_REQUEST };
+        const dummyAction = cancelUserRequest();
 
         const gen = saga();
         let next = gen.next();
@@ -300,8 +301,8 @@ describe('Module User', function () {
       });
 
       it('should cancel a pending user request', () => {
-        const dummyAction = { type: START_USER_REQUEST, id: 3 };
-        const dummyAction2 = { type: CANCEL_USER_REQUEST };
+        const dummyAction = startUserRequest(3);
+        const dummyAction2 = cancelUserRequest();
         const dummyTask = createMockTask();
 
         const gen = saga();
@@ -323,6 +324,107 @@ describe('Module User', function () {
         next = gen.next();
 
         expect(next.value).to.eql(take([START_USER_REQUEST, CANCEL_USER_REQUEST]));
+      });
+    });
+
+    describe('cancelableTakeFirstSaga()', () => {
+      it('should start an user request for the first time and succeed', () => {
+        const dummyAction = startUserRequest(3);
+        const dummyNewAction = userRequestSucceed({ name: 'Erwin' });
+        const dummyTask = createMockTask();
+
+        const gen = saga();
+        let next = gen.next();
+
+        expect(next.value).to.eql(take(START_USER_REQUEST));
+        next = gen.next(dummyAction);
+
+        expect(next.value).to.eql(fork(getUser, dummyAction.id));
+        next = gen.next(dummyTask);
+
+        expect(next.value).to.eql(put(userRequestStarted()));
+        next = gen.next();
+
+        expect(next.value).to.eql(
+          take([CANCEL_USER_REQUEST, USER_REQUEST_FAILED, USER_REQUEST_SUCCEED]));
+        next = gen.next(dummyNewAction);
+
+        expect(next.value).to.eql(take(START_USER_REQUEST));
+      });
+
+      it('should start an user request for the first time and failed', () => {
+        const dummyAction = startUserRequest(3);
+        const dummyNewAction = userRequestFailed(new Error('error'));
+        const dummyTask = createMockTask();
+
+        const gen = saga();
+        let next = gen.next();
+
+        expect(next.value).to.eql(take(START_USER_REQUEST));
+        next = gen.next(dummyAction);
+
+        expect(next.value).to.eql(fork(getUser, dummyAction.id));
+        next = gen.next(dummyTask);
+
+        expect(next.value).to.eql(put(userRequestStarted()));
+        next = gen.next();
+
+        expect(next.value).to.eql(
+          take([CANCEL_USER_REQUEST, USER_REQUEST_FAILED, USER_REQUEST_SUCCEED]));
+        next = gen.next(dummyNewAction);
+
+        expect(next.value).to.eql(take(START_USER_REQUEST));
+      });
+
+      it('should start an user request for the first time and be canceled', () => {
+        const dummyAction = startUserRequest(3);
+        const dummyNewAction = cancelUserRequest();
+        const dummyTask = createMockTask();
+
+        const gen = saga();
+        let next = gen.next();
+
+        expect(next.value).to.eql(take(START_USER_REQUEST));
+        next = gen.next(dummyAction);
+
+        expect(next.value).to.eql(fork(getUser, dummyAction.id));
+        next = gen.next(dummyTask);
+
+        expect(next.value).to.eql(put(userRequestStarted()));
+        next = gen.next();
+
+        expect(next.value).to.eql(
+          take([CANCEL_USER_REQUEST, USER_REQUEST_FAILED, USER_REQUEST_SUCCEED])
+        );
+        next = gen.next(dummyNewAction);
+
+        expect(next.value).to.eql(cancel(dummyTask));
+        next = gen.next();
+
+        expect(next.value).to.eql(take(START_USER_REQUEST));
+      });
+
+      it('should do nothing when a new user request is made but one is in progress', () => {
+        const dummyAction = startUserRequest(3);
+        const dummyTask = createMockTask();
+
+        const gen = saga();
+        let next = gen.next();
+
+        expect(next.value).to.eql(take(START_USER_REQUEST));
+        next = gen.next(dummyAction);
+
+        expect(next.value).to.eql(fork(getUser, dummyAction.id));
+        next = gen.next(dummyTask);
+
+        expect(next.value).to.eql(put(userRequestStarted()));
+        next = gen.next();
+
+        // Generator hanging here because it's waiting for any of the below 3 actions but
+        // the user is sending more startUserRequest actions.
+        expect(next.value).to.eql(
+          take([CANCEL_USER_REQUEST, USER_REQUEST_FAILED, USER_REQUEST_SUCCEED])
+        );
       });
     });
   });
