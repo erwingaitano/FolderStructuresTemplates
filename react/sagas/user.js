@@ -41,7 +41,7 @@ export function userRequestFailed(error) {
 // INITIAL STATE //
 ///////////////////
 
-const initialState = {
+export const initialState = {
   isRequesting: false,
   isLoaded: false
 };

@@ -1,11 +1,11 @@
 import { isCancelError } from 'redux-saga';
-import { take, put, cancel, fork } from 'redux-saga/effects';
+import { take, put, cancel, call, fork } from 'redux-saga/effects';
 import { START_USER_REQUEST, CANCEL_USER_REQUEST,
          USER_REQUEST_FAILED, USER_REQUEST_SUCCEED,
          userRequestCanceled, userRequestFailed,
          userRequestSucceed, userRequestStarted } from './user';
 
-function fakeApi(id, ms) {
+export function fakeExternalApi(id, ms) {
   return new Promise((resolve, reject) => {
     if (Math.floor(Math.random() * 100) % 2) {
       window.setTimeout(() => { reject(new Error('ERROR: An error occurred!')); }, ms);
@@ -21,9 +21,9 @@ function fakeApi(id, ms) {
   });
 }
 
-function* getUser(id) {
+export function* getUser(id) {
   try {
-    const response = yield fakeApi(id, 2000);
+    const response = yield call(fakeExternalApi, id, 2000);
     yield put(userRequestSucceed(response));
   } catch (err) {
     if (isCancelError(err)) {
