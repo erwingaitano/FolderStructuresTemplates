@@ -1,4 +1,6 @@
 # TODO
+  - Make the plugins UMD and with tests and they should obviously pass the eslint tests
+  - tab, popup should return a single instance and not be attached to the window object
   - Start using REM/EM approach to scale texts (modify the structure of the fonts here in the scss files).
   - For responsive landing pages, start adjusting the page from the max-width to the min-width (do it the other way around if you're taking a mobile first approach). Then if necessary, start adjusting the height starting from max-height all the way down to the min-height. It's important to note that you should call the mediaqueries inside the typography.scss file generally, since you will be changing the font-size of the html/body elements. Also the order in which you call them is important. It should be always from the max-width declaration, following for its childs from max-height to the min-height.
       Example:

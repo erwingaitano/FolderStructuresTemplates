@@ -120,7 +120,7 @@
 
       function onBtnOpen(event) {
         var $popup;
-        var $popupContainer;
+        var $container;
         var ajaxUrl;
         var $this = $(this);
         var popupName = $this.data('popup');
@@ -133,13 +133,13 @@
         // been downloaded so we have to make sure they exist)
         ajaxUrl = $this.data('popup-ajax-url');
         if ($popup.length) {
-          _this.$container.addClass('is-opened');
+          this.$container.addClass('is-opened');
           if (!ajaxUrl) {
             _this.openPopup($popup, $this, event);
           } else {
-            $popupContainer = $popup.find('.' + $popup.data('popup-container-class'));
+            $container = $popup.find('.' + $popup.data('popup-container-class'));
             $popup.addClass('is-loading');
-            $popupContainer.html('');
+            $container.html('');
             _this.openPopup($popup, $this, event);
             $.get($this.data('popup-ajax-url')).then(onSuccess, onError);
           }

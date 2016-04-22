@@ -11,13 +11,21 @@
   width: 100%;
   font-size: 10px;
 
-  &.has-three{
+  &.has-3{
     .tab__item{
       width: 33%;
+    }
 
-      &:nth-child(2){
+    &:nth-child(2){
+      .tab__item{
         width: 34%;
       }
+    }
+  }
+
+  &.has-4{
+    .tab__item{
+      width: 25%;
     }
   }
 
@@ -37,19 +45,19 @@
       color: #333;
     }
     &:first-child{
-      border-radius: $border-radius-default 0 0 $border-radius-default;
+      border-radius: 5px 0 0 5px;
       border-left: 1px solid #ebeef2;
     }
 
     &:last-child{
-      border-radius: 0 $border-radius-default $border-radius-default 0; 
+      border-radius: 0 5px 5px 0;
     }
 
     &.is-active{
-      background-color: $color-secondary;
-      border-color: $color-secondary;
+      background-color: #ffb600;
+      border-color: #ffb600;
       color: #fff;
-      font-weight: $font-bold;
+      font-weight: 600;
     }
   }
 }

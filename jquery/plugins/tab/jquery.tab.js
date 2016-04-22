@@ -5,8 +5,6 @@
  * How to use:
  * By default, add the class 'js-tab' to the clickable elements.
  * You must add the 'tab' and 'tab-namespace data attributes.
- * It's optional to add a 'js-tab-arrow' element to do an arrow animation.
- * It will require the same data attributes.
  *
  * For the containers, you should add the 'js-tab-container' class and
  * also the same data attributes should be added.
@@ -15,178 +13,172 @@
  * elements that should be active by default. Note that everytime you
  * click a new tab, the class 'is-active' will be set for this new tab
  * and his corresponding container.
- * 
- * 
- *       nav.tab
- *          %a.tab__item.is-active.js-tab{:'data-tab' => 'content1', :'data-tab-namespace' => 'elements'} 
- *          %a.tab__item.js-tab{:'data-tab' => 'content2', :'data-tab-namespace' => 'elements'} 
- *          %a.tab__item.js-tab{:'data-tab' => 'content3', :'data-tab-namespace' => 'elements'} 
- *         
- *       .tab-container.is-active.js-tab-container{:'data-tab' => 'content1', :'data-tab-namespace' => 'elements'}
- *       .tab-container.js-tab-container{:'data-tab' => 'content2', :'data-tab-namespace' => 'elements'}
- *       .tab-container.js-tab-container{:'data-tab' => 'content3', :'data-tab-namespace' => 'elements'}
- *        
- * 
  */
 
-(function(){
-  window.tab = Tab;
+//////////////////////
+// Jade/Pug Example //
+//////////////////////
 
-  var isInitialized = false;
+// nav.tab.has-3
+//   a.tab__item.is-active.js-tab(data-tab='content1', data-tab-namespace='elements') tab1
+//   a.tab__item.js-tab(data-tab='content2', data-tab-namespace='elements') tab2
+//   a.tab__item.js-tab(data-tab='content3', data-tab-namespace='elements') tab3
+//
+// .tab-container.is-active.js-tab-container(data-tab='content1', data-tab-namespace='elements')
+// .tab-container.js-tab-container(data-tab='content2', data-tab-namespace='elements')
+// .tab-container.js-tab-container(data-tab='content3', data-tab-namespace='elements')
+
+////////////////
+// Definition //
+////////////////
+
+// Uses CommonJS, AMD or browser globals to create a jQuery plugin.
+
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD.
+    define(['jquery'], factory);
+  } else if (typeof module === 'object' && module.exports) {
+    // Node/CommonJS. Dependencies
+    module.exports = function (root, jQuery) {
+      if (jQuery === undefined) {
+        // require('jQuery') returns a factory that requires window to
+        // build a jQuery instance, we normalize how we use modules
+        // that require this pattern but the window provided is a noop
+        // if it's defined (how jquery works)
+        if (typeof window !== 'undefined') {
+          jQuery = require('jquery');
+        } else {
+          jQuery = require('jquery')(root);
+        }
+      }
+      factory(jQuery);
+      return jQuery;
+    };
+  } else {
+    // Browser globals
+    factory(jQuery);
+  }
+}(function ($) {
   var pluginName = 'tab';
-  var defaults  = {
-    selectors: {
-      parent: '.js-body',
-      tabs: '.js-tab',
-      arrow: '.js-tab-arrow',
-      container: '.js-tab-container',
-    },
-    arrowAnimationDelay: 0
+  var defaults = {
+    parent: '.js-body',
+    tabClass: '.js-tab',
+    containerClass: '.js-tab-container'
   };
 
-  // Constructor
-  function Tab(options){
-    this._defaults = defaults;
-    this.settings = $.extend({}, this._defaults, options);
+  function Tab(options) {
+    this.settings = $.extend({}, defaults, options);
+    this.$parent = $(this.settings.parent);
     this.init();
-    $(window).load(this.init.bind(this));
+
     return this;
   }
 
   Tab.prototype = {
-    init: function(){
-      var $parent = $(this.settings.selectors.parent);
-      var _this = this;
+    init: function () {
 
-      // This is a flag to indicate if an instance was already created.
-      // We need to do this since the initialization can be call in two ways:
-      // By normal flow execution or the load event or both. So to avoid duplication
-      // we opt for do this check.
+      /////////////
+      // METHODS //
+      /////////////
 
-      if(isInitialized) return true;
-      if($parent.length) isInitialized = true;
-
-      // For all the tabs that can be in the document
-      this.updateArrows();
-
-      // On click
-      $parent.on('click', this.settings.selectors.tabs, function(){
-        _this.onClick(this);
-      });
-    },
-
-    onClick: function(element){
-      var _this = this;
-      var $element = $(element);
-      var namespace = $element.data('tab-namespace');
-      var name = $element.data('tab');
-      var $containers = belongsToNamespace($(this.settings.selectors.container), namespace);
-      var $tabs = belongsToNamespace($(this.settings.selectors.tabs), namespace);
-      var $arrow = belongsToNamespace($(this.settings.selectors.arrow), namespace);
-
-      initTab();
-      initArrow();
-
-      function initTab(){
-        var $currentContainers = filterByClass($containers, 'is-active');
-        var $activeContainers = filterByData($containers, 'tab', name);
-        var $activeTabs = filterByData($tabs, 'tab', name);
-        $tabs.removeClass('is-active');
-        $activeTabs.addClass('is-active');
-
-        if($currentContainers.data('tab') != $activeContainers.data('tab')){
-          window.setTimeout(function(){
-            $activeContainers.addClass('is-active');
-            $currentContainers.removeClass('is-active');
-            _this.triggerTabChange(namespace, $activeContainers);
-          }, 0);
-        }
-      }
-
-      function initArrow(){
-        if($arrow.length){
-          var translateX = this.getCssBrowserTranslate($arrow);
-          translateX = translateX ? parseFloat(translateX[4]) : 0;
-          var offset = ($element.offset().left + $element.outerWidth()/2) - ($arrow.offset().left + $arrow.outerWidth()/2) + translateX;
-          $arrow.css(this.cssCrossBrowserTranslate('translateX(' + offset + 'px)'));
-        }
-      }
-
-      function filterByClass(elements, className){
-        return elements.filter(function(){
+      function filterByClass(elements, className) {
+        return elements.filter(function () {
           return $(this).hasClass(className);
         });
       }
-      function filterByData(elements, dataNamespace, comparator){
-        return elements.filter(function(i, el){
+
+      function filterByData(elements, dataNamespace, comparator) {
+        return elements.filter(function (i, el) {
           return $(el).data(dataNamespace) == comparator;
         });
       }
 
-      function belongsToNamespace(elements, namespace){
-        return elements.filter(function(i, el){
+      function belongsToNamespace(elements, namespace) {
+        return elements.filter(function (i, el) {
           return $(el).data('tab-namespace') == namespace;
         });
       }
-    },
 
-    updateArrows: function(){
-      var _this = this;
-      $(this.settings.selectors.tabs +'.is-active').each(update);
+      function onClick(event) {
+        var _this = this;
+        var $element = $(event.target);
+        var namespace = $element.data('tab-namespace');
+        var name = $element.data('tab');
 
-      function update(){
-        var $this = $(this);
-        var namespace = $this.data('tab-namespace');
-        var arrowOffset = 0;
-        var $arrow = $(_this.settings.selectors.arrow + '[data-tab-namespace="' + namespace + '"]');
+        var $containers = this.$parent.find(this.settings.containerClass);
+        $containers = belongsToNamespace($containers, namespace);
+        var $currentActiveContainers = filterByClass($containers, 'is-active');
+        var $nextActiveContainers = filterByData($containers, 'tab', name);
 
-        if($arrow.length){
-          var translateX = _this.getCssBrowserTranslate($arrow);
-          translateX = translateX ? parseFloat(translateX[4]) : 0;
-          arrowOffset = $arrow.offset().left + $arrow.outerWidth()/2;
-          var offset = ($this.offset().left + $this.outerWidth()/2) - arrowOffset + translateX;
-          $arrow.css(_this.cssCrossBrowserTranslate('translateX(' + offset + 'px)'));
-          window.setTimeout(function(){ $arrow.addClass('is-animated');}, _this.settings.arrowAnimationDelay);
+        var $tabs = this.$parent.find(this.settings.tabClass);
+        $tabs = belongsToNamespace($tabs, namespace);
+
+        var $activeTabs = filterByData($tabs, 'tab', name);
+        $tabs.removeClass('is-active');
+        $activeTabs.addClass('is-active');
+
+        if ($currentActiveContainers.data('tab') !== $nextActiveContainers.data('tab')) {
+          window.setTimeout(function () {
+            $nextActiveContainers.addClass('is-active');
+            $currentActiveContainers.removeClass('is-active');
+            _this.triggerTabChange(namespace, $nextActiveContainers);
+          }, 0);
         }
       }
+
+      ///////////
+      // LOGIC //
+      ///////////
+
+      this.$parent.on('click.jqueryPlugin' + pluginName, this.settings.tabClass, onClick.bind(this));
     },
 
-    onTabChange: function(tabNamespace, callback){
-      $(this).on(tabNamespace, function(e, container){
+
+    onTabChange: function (tabNamespace, callback) {
+      $(this).on(tabNamespace, function (e, container) {
         callback(container);
       });
     },
 
-    triggerTabChange: function(tabNamespace, container){
+    triggerTabChange: function (tabNamespace, container) {
       $(this).trigger(tabNamespace, container);
     },
 
-    goToTab: function(tabName, tabNamespace){
+    goToTab: function (tabName, tabNamespace) {
       var el = $('<div/>');
       el.data('tab', tabName);
       el.data('tab-namespace', tabNamespace);
       this.onClick(el[0]);
     },
 
-    getCssBrowserTranslate: function(el){
-      if($(el).css('transform')){
+    getCssBrowserTranslate: function (el) {
+      if ($(el).css('transform')) {
         return $(el).css('transform').match(/(-?[0-9\.]+)/g);
-      }else{
-        if($(el).css('webkitTransform')){
+      } else {
+        if ($(el).css('webkitTransform')) {
           return $(el).css('webkitTransform').match(/(-?[0-9\.]+)/g);
         }
       }
-      return false;      
+      return false;
     },
 
-    cssCrossBrowserTranslate: function(value){
+    cssCrossBrowserTranslate: function (value) {
       return {
-        '-webkit-transform' : value,
-        '-moz-transform'    : value,
-        '-ms-transform'     : value,
-        '-o-transform'      : value,
-        'transform'         : value,
+        '-webkit-transform': value,
+        '-moz-transform': value,
+        '-ms-transform': value,
+        '-o-transform': value,
+        'transform': value,
       };
+    },
+
+    destroy: function() {
+      this.$parent.off('click.jqueryPlugin' + pluginName);
     }
+
+    // TODO: Remove functions from the prototypes if no needed
   };
-})();
+
+  return Tab;
+}));

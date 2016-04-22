@@ -1,0 +1,13 @@
+.toggler-container{
+  transition: height 0.7s;
+  height: 0;
+  overflow: hidden;
+
+  &.no-animated{
+    transition: none;
+  }
+}
+
+.toggler{
+
+}
