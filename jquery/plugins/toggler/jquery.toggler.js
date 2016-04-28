@@ -50,8 +50,8 @@
     onOpen: function () {},
     animationDuration: 700,
     parent: 'js-body',
-    containers: '.js-toggler-container',
-    togglerBtn: '.js-toggler'
+    containerClass: '.js-toggler-container',
+    togglerBtnClass: '.js-toggler'
   };
 
   // The actual plugin constructor
@@ -72,12 +72,12 @@
         this.$parent = $(this.settings.parent);
       }
 
-      this.$parent.on('click.' + pluginName, this.settings.togglerBtn, onClick);
+      this.$parent.on('click.' + pluginName, this.settings.togglerBtnClass, onClick);
 
       function onClick(event) {
         var $btn = $(this);
         if (event) event.preventDefault();
-        opener(_this, $btn, $btn.data('toggler'));
+        opener(_this, $btn, $btn.data('toggler'), $btn.data('toggler-namespace'));
       }
     },
 
@@ -86,11 +86,11 @@
       var $activeContainers;
       options = options || {};
       if (!options.namespace) {
-        $activeContainers = $(this.settings.containers + '.is-active');
+        $activeContainers = this.$parent.find(this.settings.containerClass + '.is-active');
         if (options.isNotAnimated) $activeContainers.addClass('no-animated');
 
         // Animate elements
-        window.setTimeout(function () { updateElements($activeContainers);}, 0);
+        window.setTimeout(function () { updateElementsHeight($activeContainers);}, 0);
 
         // Remove the no-animated class after the animation if the option.isNotAnimated
         // was true
@@ -102,8 +102,8 @@
       }
     },
 
-    toggle: function ($btn, togglerNamespace) {
-      opener(this, $btn, togglerNamespace);
+    toggle: function ($btn, toggler, togglerNamespace) {
+      opener(this, $btn, toggler, togglerNamespace);
     },
 
     destroy: function () {
@@ -111,20 +111,31 @@
     }
   };
 
-  function opener(context, $btn, namespace) {
+  function opener(context, $btn, toggler, togglerNamespace) {
     var isActive;
-    var $containers = context.$parent.find(context.settings.containers);
-    var $activeContainers = filterByData($containers, 'toggler', namespace);
+    var $containers = context.$parent.find(context.settings.containerClass);
+    var $btns = context.$parent.find(context.settings.togglerBtnClass);
+    var $activeContainers = filterByData($containers, 'toggler', toggler);
+    var $sameNamespaceContainers = filterByData($containers, 'toggler-namespace', togglerNamespace);
+    var $sameNamespaceBtns = filterByData($btns, 'toggler-namespace', togglerNamespace);
+
+    $sameNamespaceContainers = $sameNamespaceContainers.not($activeContainers);
+    $sameNamespaceBtns = $sameNamespaceBtns.not($btn);
+
+    window.$ = $;
+    $sameNamespaceContainers.removeClass('is-active');
+    $sameNamespaceContainers.css('height', 0);
+    $sameNamespaceBtns.removeClass('is-active');
 
     $btn.toggleClass('is-active');
     isActive = $btn.hasClass('is-active');
 
     $activeContainers.toggleClass('is-active');
-    if (isActive) updateElements($activeContainers);
+    if (isActive) updateElementsHeight($activeContainers);
     else $activeContainers.css('height', 0);
   }
 
-  function updateElements(elements) {
+  function updateElementsHeight(elements) {
     elements.each(function (i, el) {
       var $el = $(el);
       var elHeight = calculateSizeOfElement($el).height;
