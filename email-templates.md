@@ -1,0 +1,2 @@
+- for images: use min-height max-height instead of height
+- only use margin in the body. If you need separation between elements, use padding-right or <td width='3'></td>

@@ -75,61 +75,55 @@
     return this;
   }
 
+  function filterByClass(elements, className) {
+    return elements.filter(function () {
+      return $(this).hasClass(className);
+    });
+  }
+
+  function filterByData(elements, dataNamespace, comparator) {
+    return elements.filter(function (i, el) {
+      return $(el).data(dataNamespace) === comparator;
+    });
+  }
+
+  function belongsToNamespace(elements, namespace) {
+    return elements.filter(function (i, el) {
+      return $(el).data('tab-namespace') === namespace;
+    });
+  }
+
+  function setActiveContainer(pluginContext, tabName, namespace) {
+    var $containers = pluginContext.$parent.find(pluginContext.settings.containerClass);
+    $containers = belongsToNamespace($containers, namespace);
+    var $currentActiveContainers = filterByClass($containers, 'is-active');
+    var $nextActiveContainers = filterByData($containers, 'tab', tabName);
+
+    var $tabs = pluginContext.$parent.find(pluginContext.settings.tabClass);
+    $tabs = belongsToNamespace($tabs, namespace);
+
+    var $activeTabs = filterByData($tabs, 'tab', tabName);
+    $tabs.removeClass('is-active');
+    $activeTabs.addClass('is-active');
+
+    if ($currentActiveContainers.data('tab') !== $nextActiveContainers.data('tab')) {
+      window.setTimeout(function () {
+        $nextActiveContainers.addClass('is-active');
+        $currentActiveContainers.removeClass('is-active');
+        pluginContext.triggerTabChange(namespace, $nextActiveContainers);
+      }, 0);
+    }
+  }
+
   Tab.prototype = {
     init: function () {
-
-      /////////////
-      // METHODS //
-      /////////////
-
-      function filterByClass(elements, className) {
-        return elements.filter(function () {
-          return $(this).hasClass(className);
-        });
-      }
-
-      function filterByData(elements, dataNamespace, comparator) {
-        return elements.filter(function (i, el) {
-          return $(el).data(dataNamespace) == comparator;
-        });
-      }
-
-      function belongsToNamespace(elements, namespace) {
-        return elements.filter(function (i, el) {
-          return $(el).data('tab-namespace') == namespace;
-        });
-      }
-
       function onClick(event) {
-        var _this = this;
         var $element = $(event.target);
         var namespace = $element.data('tab-namespace');
-        var name = $element.data('tab');
+        var tabName = $element.data('tab');
 
-        var $containers = this.$parent.find(this.settings.containerClass);
-        $containers = belongsToNamespace($containers, namespace);
-        var $currentActiveContainers = filterByClass($containers, 'is-active');
-        var $nextActiveContainers = filterByData($containers, 'tab', name);
-
-        var $tabs = this.$parent.find(this.settings.tabClass);
-        $tabs = belongsToNamespace($tabs, namespace);
-
-        var $activeTabs = filterByData($tabs, 'tab', name);
-        $tabs.removeClass('is-active');
-        $activeTabs.addClass('is-active');
-
-        if ($currentActiveContainers.data('tab') !== $nextActiveContainers.data('tab')) {
-          window.setTimeout(function () {
-            $nextActiveContainers.addClass('is-active');
-            $currentActiveContainers.removeClass('is-active');
-            _this.triggerTabChange(namespace, $nextActiveContainers);
-          }, 0);
-        }
+        setActiveContainer(this, tabName, namespace);
       }
-
-      ///////////
-      // LOGIC //
-      ///////////
 
       this.$parent.on('click.jqueryPlugin' + pluginName, this.settings.tabClass, onClick.bind(this));
     },
@@ -146,10 +140,7 @@
     },
 
     goToTab: function (tabName, tabNamespace) {
-      var el = $('<div/>');
-      el.data('tab', tabName);
-      el.data('tab-namespace', tabNamespace);
-      this.onClick(el[0]);
+      setActiveContainer(this, tabName, tabNamespace);
     },
 
     getCssBrowserTranslate: function (el) {
