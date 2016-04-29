@@ -118,7 +118,7 @@
   Tab.prototype = {
     init: function () {
       function onClick(event) {
-        var $element = $(event.target);
+        var $element = $(event.currentTarget);
         var namespace = $element.data('tab-namespace');
         var tabName = $element.data('tab');
 
