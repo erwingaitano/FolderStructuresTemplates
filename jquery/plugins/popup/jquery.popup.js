@@ -6,7 +6,7 @@
     You should assing the plugin to a global namespace different from popup and
     it should be initialize only once. Example:
 
-    window.popupManager = window.popupManager || new window.popup();
+    window.popupManager = window.popupManager || new window.jqueryPopup();
 
   How to use:
     Basic:
@@ -62,6 +62,11 @@
   } else if (typeof exports === 'object') {
     // Node, CommonJS-like
     module.exports = factory(require('jquery'));
+  } else {
+    // Browser globals (root is window)
+    // If you don't want to export to the window object, you
+    // can remove this else statement
+    root.jqueryPopup = factory(root.$);
   }
 }(this, function init($) {
   var eventListeners = [];

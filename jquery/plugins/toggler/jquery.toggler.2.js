@@ -1,4 +1,7 @@
-/*!
+/* eslint prefer-arrow-callback: 0, prefer-template: 0, no-var: 0, object-shorthand: 0 */
+/* global define */
+
+/*
  * jQuery lightweight plugin boilerplate
  * Original author: @ajpiano
  * Further changes, comments: @addyosmani
@@ -9,52 +12,37 @@
 // net against concatenated scripts and/or other plugins
 // that are not closed properly.
 
-// Uses CommonJS, AMD or browser globals to create a jQuery plugin.
-
-(function (factory) {
+(function init(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
     define(['jquery'], factory);
-  } else if (typeof module === 'object' && module.exports) {
-    // Node/CommonJS
-    module.exports = function( root, jQuery ) {
-      if ( jQuery === undefined ) {
-        // require('jQuery') returns a factory that requires window to
-        // build a jQuery instance, we normalize how we use modules
-        // that require this pattern but the window provided is a noop
-        // if it's defined (how jquery works)
-        if ( typeof window !== 'undefined' ) {
-            jQuery = require('jquery');
-        }
-        else {
-            jQuery = require('jquery')(root);
-        }
-      }
-      factory(jQuery);
-      return jQuery;
-    };
+  } else if (typeof exports === 'object') {
+    // Node, CommonJS-like
+    module.exports = factory(require('jquery'));
   } else {
-    // Browser globals
-    factory(jQuery);
+    // Browser globals (root is window)
+    // If you don't want to export to the window object, you
+    // can remove this else statement
+    root.jqueryToggler = factory(root.$);
   }
-}(function ($) {
-
+}(this, function init($) {
   var pluginName = 'toggler';
 
   // Create the defaults once
   // To initiate the plugin, call it as 'new window[pluginName]' and assign it to a global variable
   var defaults = {
-    onBeforeClose: function () { return true; },
-    onBeforeOpen: function () { return true; },
-    onClose: function () {},
-    onOpen: function () {},
+    onBeforeClose: function init() { return true; },
+    onBeforeOpen: function init() { return true; },
+    onClose: function init() {},
+    onOpen: function init() {},
     animationDuration: 700,
     parent: 'js-body',
-    containerClass: '.js-toggler-container',
-    togglerBtnClass: '.js-toggler'
+    containers: '.js-toggler-container',
+    togglerBtn: '.js-toggler'
   };
 
   // The actual plugin constructor
+
   function Plugin(options) {
     this.settings = $.extend({}, defaults, options);
     this._defaults = defaults;
@@ -62,84 +50,8 @@
     this.init();
   }
 
-  Plugin.prototype = {
-    init: function () {
-      var _this = this;
-
-      if (typeof this.settings.parent === 'string') {
-        this.$parent = $('.' + this.settings.parent);
-      } else {
-        this.$parent = $(this.settings.parent);
-      }
-
-      this.$parent.on('click.' + pluginName, this.settings.togglerBtnClass, onClick);
-
-      function onClick(event) {
-        var $btn = $(this);
-        if (event) event.preventDefault();
-        opener(_this, $btn, $btn.data('toggler'), $btn.data('toggler-namespace'));
-      }
-    },
-
-    updateContainerSizes: function (options) {
-      var _this = this;
-      var $activeContainers;
-      options = options || {};
-      if (!options.namespace) {
-        $activeContainers = this.$parent.find(this.settings.containerClass + '.is-active');
-        if (options.isNotAnimated) $activeContainers.addClass('no-animated');
-
-        // Animate elements
-        window.setTimeout(function () { updateElementsHeight($activeContainers);}, 0);
-
-        // Remove the no-animated class after the animation if the option.isNotAnimated
-        // was true
-        window.setTimeout(function () {
-          $activeContainers.removeClass('no-animated');
-        }, _this.settings.animationDuration);
-      } else {
-        // TODO::You should allow also individual container updates
-      }
-    },
-
-    toggle: function ($btn, toggler, togglerNamespace) {
-      opener(this, $btn, toggler, togglerNamespace);
-    },
-
-    destroy: function () {
-      this.$parent.off('.' + this._name);
-    }
-  };
-
-  function opener(context, $btn, toggler, togglerNamespace) {
-    var isActive;
-    var $containers = context.$parent.find(context.settings.containerClass);
-    var $btns = context.$parent.find(context.settings.togglerBtnClass);
-    var $activeContainers = filterByData($containers, 'toggler', toggler);
-    var $sameNamespaceContainers = filterByData($containers, 'toggler-namespace', togglerNamespace);
-    var $sameNamespaceBtns = filterByData($btns, 'toggler-namespace', togglerNamespace);
-
-    $sameNamespaceContainers.removeClass('is-active');
-    $sameNamespaceContainers.css('height', 0);
-    $sameNamespaceBtns.removeClass('is-active');
-    $btn.toggleClass('is-active');
-    isActive = $btn.hasClass('is-active');
-
-    $activeContainers.toggleClass('is-active');
-    if (isActive) updateElementsHeight($activeContainers);
-    else $activeContainers.css('height', 0);
-  }
-
-  function updateElementsHeight(elements) {
-    elements.each(function (i, el) {
-      var $el = $(el);
-      var elHeight = calculateSizeOfElement($el).height;
-      $el.css('height', elHeight);
-    });
-  }
-
   function filterByData(elements, dataNamespace, comparator) {
-    return elements.filter(function (i, el) {
+    return elements.filter(function init(i, el) {
       return $(el).data(dataNamespace) === comparator;
     });
   }
@@ -162,6 +74,76 @@
 
     return sizes;
   }
+
+  function updateElements(elements) {
+    elements.each(function init(i, el) {
+      var $el = $(el);
+      var elHeight = calculateSizeOfElement($el).height;
+      $el.css('height', elHeight);
+    });
+  }
+
+  function opener(context, $btn, namespace) {
+    var isActive;
+    var $containers = context.$parent.find(context.settings.containers);
+    var $activeContainers = filterByData($containers, 'toggler', namespace);
+
+    $btn.toggleClass('is-active');
+    isActive = $btn.hasClass('is-active');
+
+    $activeContainers.toggleClass('is-active');
+    if (isActive) updateElements($activeContainers);
+    else $activeContainers.css('height', 0);
+  }
+
+  Plugin.prototype = {
+    init: function init() {
+      var _this = this;
+
+      function onClick(event) {
+        var $btn = $(this);
+        if (event) event.preventDefault();
+        opener(_this, $btn, $btn.data('toggler'));
+      }
+
+      if (typeof this.settings.parent === 'string') {
+        this.$parent = $('.' + this.settings.parent);
+      } else {
+        this.$parent = $(this.settings.parent);
+      }
+
+      this.$parent.on('click.' + pluginName, this.settings.togglerBtn, onClick);
+    },
+
+    updateContainerSizes: function init(options) {
+      var _this = this;
+      var $activeContainers;
+      options = options || {};
+      if (!options.namespace) {
+        $activeContainers = $(this.settings.containers + '.is-active');
+        if (options.isNotAnimated) $activeContainers.addClass('no-animated');
+
+        // Animate elements
+        window.setTimeout(function init() { updateElements($activeContainers);}, 0);
+
+        // Remove the no-animated class after the animation if the option.isNotAnimated
+        // was true
+        window.setTimeout(function init() {
+          $activeContainers.removeClass('no-animated');
+        }, _this.settings.animationDuration);
+      } else {
+        // TODO::You should allow also individual container updates
+      }
+    },
+
+    toggle: function init($btn, togglerNamespace) {
+      opener(this, $btn, togglerNamespace);
+    },
+
+    destroy: function init() {
+      this.$parent.off('.' + this._name);
+    }
+  };
 
   return Plugin;
 }));

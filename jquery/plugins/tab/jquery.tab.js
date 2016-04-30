@@ -42,6 +42,11 @@
   } else if (typeof exports === 'object') {
     // Node, CommonJS-like
     module.exports = factory(require('jquery'));
+  } else {
+    // Browser globals (root is window)
+    // If you don't want to export to the window object, you
+    // can remove this else statement
+    root.jqueryTab = factory(root.$);
   }
 }(this, function init($) {
   var pluginName = 'tab';
@@ -118,7 +123,6 @@
                       onClick.bind(this));
     },
 
-
     onTabChange: function init(tabNamespace, callback) {
       $(this).on(tabNamespace, function init(e, container) {
         callback(container);
@@ -133,31 +137,9 @@
       setActiveContainer(this, tabName, tabNamespace);
     },
 
-    getCssBrowserTranslate: function init(el) {
-      if ($(el).css('transform')) {
-        return $(el).css('transform').match(/(-?[0-9\.]+)/g);
-      } else if ($(el).css('webkitTransform')) {
-        return $(el).css('webkitTransform').match(/(-?[0-9\.]+)/g);
-      }
-
-      return null;
-    },
-
-    cssCrossBrowserTranslate: function init(value) {
-      return {
-        '-webkit-transform': value,
-        '-moz-transform': value,
-        '-ms-transform': value,
-        '-o-transform': value,
-        transform: value
-      };
-    },
-
     destroy: function init() {
       this.$parent.off('click.jqueryPlugin' + pluginName);
     }
-
-    // TODO: Remove functions from the prototypes if no needed
   };
 
   return Tab;
