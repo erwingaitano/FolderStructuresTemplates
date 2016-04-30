@@ -1,3 +1,6 @@
+/* eslint prefer-arrow-callback: 0, prefer-template: 0, no-var: 0, object-shorthand: 0 */
+/* global define */
+
 /**
  * Jquery.Tab 1.0
  * Author: Erwin Gaitan Ospino
@@ -32,34 +35,15 @@
 // Definition //
 ////////////////
 
-// Uses CommonJS, AMD or browser globals to create a jQuery plugin.
-
-(function (factory) {
+(function init(root, factory) {
   if (typeof define === 'function' && define.amd) {
-    // AMD.
+    // AMD. Register as an anonymous module.
     define(['jquery'], factory);
-  } else if (typeof module === 'object' && module.exports) {
-    // Node/CommonJS. Dependencies
-    module.exports = function (root, jQuery) {
-      if (jQuery === undefined) {
-        // require('jQuery') returns a factory that requires window to
-        // build a jQuery instance, we normalize how we use modules
-        // that require this pattern but the window provided is a noop
-        // if it's defined (how jquery works)
-        if (typeof window !== 'undefined') {
-          jQuery = require('jquery');
-        } else {
-          jQuery = require('jquery')(root);
-        }
-      }
-      factory(jQuery);
-      return jQuery;
-    };
-  } else {
-    // Browser globals
-    factory(jQuery);
+  } else if (typeof exports === 'object') {
+    // Node, CommonJS-like
+    module.exports = factory(require('jquery'));
   }
-}(function ($) {
+}(this, function init($) {
   var pluginName = 'tab';
   var defaults = {
     parent: '.js-body',
@@ -76,38 +60,43 @@
   }
 
   function filterByClass(elements, className) {
-    return elements.filter(function () {
+    return elements.filter(function init() {
       return $(this).hasClass(className);
     });
   }
 
   function filterByData(elements, dataNamespace, comparator) {
-    return elements.filter(function (i, el) {
+    return elements.filter(function init(i, el) {
       return $(el).data(dataNamespace) === comparator;
     });
   }
 
   function belongsToNamespace(elements, namespace) {
-    return elements.filter(function (i, el) {
+    return elements.filter(function init(i, el) {
       return $(el).data('tab-namespace') === namespace;
     });
   }
 
   function setActiveContainer(pluginContext, tabName, namespace) {
     var $containers = pluginContext.$parent.find(pluginContext.settings.containerClass);
-    $containers = belongsToNamespace($containers, namespace);
-    var $currentActiveContainers = filterByClass($containers, 'is-active');
-    var $nextActiveContainers = filterByData($containers, 'tab', tabName);
+    var $currentActiveContainers;
+    var $nextActiveContainers;
+    var $tabs;
+    var $activeTabs;
 
-    var $tabs = pluginContext.$parent.find(pluginContext.settings.tabClass);
+    $containers = belongsToNamespace($containers, namespace);
+    $currentActiveContainers = filterByClass($containers, 'is-active');
+    $nextActiveContainers = filterByData($containers, 'tab', tabName);
+
+    $tabs = pluginContext.$parent.find(pluginContext.settings.tabClass);
     $tabs = belongsToNamespace($tabs, namespace);
 
-    var $activeTabs = filterByData($tabs, 'tab', tabName);
+    $activeTabs = filterByData($tabs, 'tab', tabName);
     $tabs.removeClass('is-active');
     $activeTabs.addClass('is-active');
 
     if ($currentActiveContainers.data('tab') !== $nextActiveContainers.data('tab')) {
-      window.setTimeout(function () {
+      window.setTimeout(function init() {
         $nextActiveContainers.addClass('is-active');
         $currentActiveContainers.removeClass('is-active');
         pluginContext.triggerTabChange(namespace, $nextActiveContainers);
@@ -116,7 +105,7 @@
   }
 
   Tab.prototype = {
-    init: function () {
+    init: function init() {
       function onClick(event) {
         var $element = $(event.currentTarget);
         var namespace = $element.data('tab-namespace');
@@ -125,46 +114,46 @@
         setActiveContainer(this, tabName, namespace);
       }
 
-      this.$parent.on('click.jqueryPlugin' + pluginName, this.settings.tabClass, onClick.bind(this));
+      this.$parent.on('click.jqueryPlugin' + pluginName, this.settings.tabClass,
+                      onClick.bind(this));
     },
 
 
-    onTabChange: function (tabNamespace, callback) {
-      $(this).on(tabNamespace, function (e, container) {
+    onTabChange: function init(tabNamespace, callback) {
+      $(this).on(tabNamespace, function init(e, container) {
         callback(container);
       });
     },
 
-    triggerTabChange: function (tabNamespace, container) {
+    triggerTabChange: function init(tabNamespace, container) {
       $(this).trigger(tabNamespace, container);
     },
 
-    goToTab: function (tabName, tabNamespace) {
+    goToTab: function init(tabName, tabNamespace) {
       setActiveContainer(this, tabName, tabNamespace);
     },
 
-    getCssBrowserTranslate: function (el) {
+    getCssBrowserTranslate: function init(el) {
       if ($(el).css('transform')) {
         return $(el).css('transform').match(/(-?[0-9\.]+)/g);
-      } else {
-        if ($(el).css('webkitTransform')) {
-          return $(el).css('webkitTransform').match(/(-?[0-9\.]+)/g);
-        }
+      } else if ($(el).css('webkitTransform')) {
+        return $(el).css('webkitTransform').match(/(-?[0-9\.]+)/g);
       }
-      return false;
+
+      return null;
     },
 
-    cssCrossBrowserTranslate: function (value) {
+    cssCrossBrowserTranslate: function init(value) {
       return {
         '-webkit-transform': value,
         '-moz-transform': value,
         '-ms-transform': value,
         '-o-transform': value,
-        'transform': value,
+        transform: value
       };
     },
 
-    destroy: function() {
+    destroy: function init() {
       this.$parent.off('click.jqueryPlugin' + pluginName);
     }
 
