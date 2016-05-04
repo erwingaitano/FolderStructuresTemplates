@@ -28,7 +28,7 @@
       this.name = titleCasedName;
       this.message = message;
       this.data = data || {};
-      Error.captureStackTrace(this, creator);
+      this.stack = (new Error()).stack;
     }
 
     creator.prototype = Object.create(Error.prototype);
