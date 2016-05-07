@@ -89,6 +89,9 @@
     this.settings = $.extend({}, this._defaults, options);
     this.$container = $(this.settings.container);
     this.$popups = this.$container.find(this.settings.popups);
+    this.closePopups = this.closePopups.bind(this);
+    this.openPopup = this.openPopup.bind(this);
+    this.getActivePopup = this.getActivePopup.bind(this);
     this.init();
     return this;
   }
@@ -151,7 +154,7 @@
       this.$container.off('.' + pluginName);
       this.$container.on('click.' + pluginName + ' touchstart.' + pluginName, onTampaxClick);
       $(this.settings.openBtn).bind('click.' + pluginName, onBtnOpen);
-      $(this.settings.closeBtn).bind('click.' + pluginName, this.closePopups.bind(this));
+      $(this.settings.closeBtn).bind('click.' + pluginName, this.closePopups);
     },
 
     openPopup: function init(popup, btn, event) {
