@@ -5,7 +5,7 @@
  * Licensed under the MIT license
  */
 
- /* 
+ /*
   How to use:
     Just call $('select').select();
 */
@@ -13,8 +13,19 @@
 // the semi-colon before the function invocation is a safety
 // net against concatenated scripts and/or other plugins
 // that are not closed properly.
-;
-(function($, window, document, undefined) {
+
+/* eslint prefer-arrow-callback: 0 */
+/* global define */
+
+(function init(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(['jquery'], factory);
+  } else if (typeof exports === 'object') {
+    // Node, CommonJS-like
+    module.exports = factory(require('jquery'));
+  }
+}(this, function init($) {
 
   var clickOutsideViewer;
   // window and document are passed through as local
@@ -52,7 +63,7 @@
   }
 
   Plugin.prototype = {
-    init: function() {
+    init: function () {
       var _this = this;
       var $select = $(this.element);
       var $options = $select.find('option');
@@ -103,39 +114,36 @@
           $select.trigger('change');
         });
 
-        $select.on('change', function(){
+        $select.on('change', function() {
           $newSelect.text($select.find(':selected').text());
           $newSelect.attr('data-value', $select.val());
         });
 
-        function toggleContainerOpenStatus(){
+        function toggleContainerOpenStatus() {
           $newContainer.toggleClass('is-opened');
           $newSelect.toggleClass('is-opened');
         }
       }
 
-      function onClickoutside(e){
+      function onClickoutside(e) {
         if (!$(e.target).closest('.' + _this.options.jsChooserClassname + ', .' + _this.options.containerJsClassname + ', ' + _this.options.clickOutsideExceptionsElements).length) {
           $newContainer.removeClass('is-opened');
           $newSelect.removeClass('is-opened');
         }
-      };
-    },
-
-    yourOtherFunction: function(el, options) {
-      // some logic
+      }
     }
   };
 
+  // TODO: Destroy method
+
   // A really lightweight plugin wrapper around the constructor,
   // preventing against multiple instantiations
-  $.fn[pluginName] = function(options) {
-    return this.each(function() {
+  $.fn[pluginName] = function (options) {
+    return this.each(function () {
       if (!$.data(this, 'plugin_' + pluginName)) {
         $.data(this, 'plugin_' + pluginName,
           new Plugin(this, options));
       }
     });
   };
-
-})(jQuery, window, document);
+}));

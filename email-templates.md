@@ -1,5 +1,12 @@
 - Test with https://putsmail.com/
 
+# GENERAL
+  - should never be display: block;
+  - use min-height max-height and height instead of just height
+  - if you use images inside tds (td>img(src='werewr')) make sure to
+    set { font-size: 0; line-height: 0; } in the td so there's no space
+    above and below
+
 # BODY
   - only use margin in the body. If you need separation between elements,
     use padding-right or <td width='3'></td>
@@ -8,6 +15,22 @@
   - nested table should have own inherited styles. For example, if an outer
     table has text-align: center; the inner table won't be affected by this rule.
 
-# IMAGES
-  - should never be display: block;
-  - use min-height max-height instead of height
+
+# RESPONSIVE
+  - To hide and show only DIV elements
+    - To hide:
+      ```css
+      {
+        max-height: 0 !important;
+        display: none !important;
+        mso-hide: all !important;
+      }
+      ```
+
+    - To Show:
+    ```css
+    {
+      max-height: none !important;
+      display: block !important;
+    }
+    ```

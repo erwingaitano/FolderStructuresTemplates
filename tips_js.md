@@ -1,3 +1,7 @@
+# JAVASCRIPT
+
+- the way you separate different process inside a file is by using iife
+
 # JQUERY PROMISES
 
 ```javascript
