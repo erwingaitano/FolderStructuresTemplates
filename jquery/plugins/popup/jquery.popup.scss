@@ -52,7 +52,11 @@
 
   &.is-loading{background: #fff; height: auto;}
   &.is-loading > *{display: none;}
-  &.is-loading:before{content: 'Loading...'; line-height: 490px;}
+  &.is-loading:before{
+    content: 'Loading...';
+    line-height: 490px;
+    font-size: 12px;
+  }
 
 
   &.is-flexbox{

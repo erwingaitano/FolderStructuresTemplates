@@ -3,9 +3,10 @@
 # GENERAL
   - should never be display: block;
   - use min-height max-height and height instead of just height
-  - if you use images inside tds (td>img(src='werewr')) make sure to
+  - if you use images inside tds (td>img(src='xxx')) make sure to
     set { font-size: 0; line-height: 0; } in the td so there's no space
     above and below
+  - avoid using width/height: 100% (except in table, you can use width: 100%)
 
 # BODY
   - only use margin in the body. If you need separation between elements,
