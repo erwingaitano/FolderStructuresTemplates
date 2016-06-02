@@ -177,7 +177,7 @@
 
         // If onBefore returns false, we don't close the popup
         fireEventListeners('onBeforeOpen', popup, btn);
-        if (!shouldOpen) return;
+        if (!shouldOpen) return null;
 
         this.$popups.removeClass('is-active');
         popup.addClass('is-active');
@@ -188,7 +188,11 @@
             popup.find('input:first').focus();
           }
         }, 200);
+
+        return popup;
       }
+
+      return null;
     },
 
     closePopups: function init() {
