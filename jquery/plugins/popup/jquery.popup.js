@@ -157,14 +157,17 @@
       $(this.settings.closeBtn).bind('click.' + pluginName, this.closePopups);
     },
 
+    getPopup: function init(popupName) {
+      return this.$popups.filter(function init(i, el) {
+        return el.attributes['data-popup'].value === popupName;
+      });
+    },
+
     openPopup: function init(popup, btn, event) {
       var _this = this;
       var shouldOpen;
 
-      popup = typeof popup === 'string' ?
-        this.$popups.filter(function init(i, el) {
-          return el.attributes['data-popup'].value === popup;
-        }) : $(popup);
+      popup = typeof popup === 'string' ? this.getPopup(popup) : $(popup);
 
       // Check that the popup exists (In angular sometimes the popups
       // haven't been downloaded so we have to make sure they exists)
